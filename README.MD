@@ -34,3 +34,4 @@ tratativa de erros
         ids não encontrado(update, delete)
         cpf iguais(post,update)
         cpf invalido(post,create)
+        crm iguais(post,create)

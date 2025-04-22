@@ -13,9 +13,8 @@ export async function DeleteMedic(
       .string()
       .uuid()
       .superRefine(async (id, ctx) => {
-        // Usando superRefine para operações assíncronas
         try {
-          const exists = await IdExistMedic(id) // Chama a função assíncrona para verificar no banco de dados
+          const exists = await IdExistMedic(id)
           if (!exists) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
