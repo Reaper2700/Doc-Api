@@ -13,6 +13,7 @@
   "devDependencies": {
     "@rocketseat/eslint-config": "^2.2.2",
     "@types/node": "^22.14.1",
+    "@types/pg": "^8.11.14",
     "eslint": "^8.57.1",
     "prisma": "^6.6.0",
     "tsup": "^8.4.0",
@@ -26,6 +27,7 @@
     "dotenv": "^16.5.0",
     "fastify": "^5.3.2",
     "fastify-cors": "^6.0.3",
+    "pg": "^8.15.5",
     "zod": "^3.24.2"
   }
 }

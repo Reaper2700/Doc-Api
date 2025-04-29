@@ -38,9 +38,12 @@ export async function registerMedicUseCase(
         })
       }
     }),
-    birthDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Invalid date format',
-    }),
+    birthDate: z
+      .string()
+      .refine((val) => !isNaN(Date.parse(val)), {
+        message: 'Invalid date format',
+      })
+      .transform((val) => new Date(val)),
   })
 
   try {

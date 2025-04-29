@@ -1,10 +1,8 @@
 import { query } from '../../../db/db'
 
-export async function IdExist(id: string): Promise<boolean> {
+export async function IdExistPlan(id: string): Promise<boolean> {
   try {
-    const res = await query('SELECT 1 FROM "Patient" WHERE id = $1 LIMIT 1', [
-      id,
-    ])
+    const res = await query('SELECT 1 FROM "PLANS" WHERE id = $1 LIMIT 1', [id])
     return res.rows.length > 0
   } catch (err) {
     console.error('Erro ao verificar existência de Plano:', err)

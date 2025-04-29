@@ -1,9 +1,13 @@
-import { prisma } from '../../lib/prisma'
+import { query } from '../../../db/db'
 
-export async function cpfExisting(cpf: string) {
-  const existing = await prisma.patient.findUnique({
-    where: { cpf },
-  })
+export async function cpfExisting(cpf: string): Promise<boolean> {
+  const sql = `
+    SELECT EXISTS (
+      SELECT 1 FROM "Patient" WHERE "cpf" = $1
+    ) AS "exists";
+  `
 
-  return !!existing
+  const result = await query(sql, [cpf])
+
+  return result.rows[0]?.exists ?? false
 }
