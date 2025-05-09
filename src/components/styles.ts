@@ -9,15 +9,14 @@ export const HeaderHomePage = styled.header`
 
 export const HomePageContainer = styled.div`
     width: 100%;
-    max-width: 1120px;
+    max-width: 1500px;
     height: auto;
 
-    padding-top: 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    background-color: white;
-    padding: 2rem 0;
+    gap: 2rem;
+    background-color: ${props => props.theme['background']};
+
 `

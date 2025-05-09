@@ -1,6 +1,7 @@
 import styled from "styled-components";
 
-export const MedicContainer =  styled.div`
+
+export const PatientContainer =  styled.div`
     width: 100%;
     max-width: 1120px;
     height: 640px;
@@ -16,7 +17,7 @@ export const MedicContainer =  styled.div`
     color: ${props => props.theme['text']}
 `
 
-export const HeaderMedicContainer = styled.div`
+export const HeaderPatientContainer = styled.div`
     width: 100%;
     max-width: 800px;
 
@@ -43,7 +44,7 @@ export const HeaderMedicContainer = styled.div`
 `
 
 
-export const ListMedic = styled.div`
+export const ListPatient = styled.div`
     width: 100%;
     max-width: 800px;
     height: 220px;
@@ -52,7 +53,7 @@ export const ListMedic = styled.div`
 
 ///////////// create medic
 
-export const CreateMedicContainer = styled.div`
+export const CreatePatientContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -62,7 +63,7 @@ export const CreateMedicContainer = styled.div`
     height: auto;
     padding-right: 650px;
     
-    .ButtonMedic{
+    .ButtonPatient{
         padding-top: 26px;
         padding-left: 1rem;
     }
@@ -84,7 +85,7 @@ export const CreateMedicContainer = styled.div`
 `
 
 
-export const CampMedic = styled.div`
+export const CampPatient = styled.div`
     display: flex;
     align-items: center;
     width: 100%;
@@ -103,14 +104,25 @@ export const CampMedic = styled.div`
     padding: 6px;
     border-color: ${props => props.theme['green-light']};
    }
+
+   .HealthPlan{
+        width: 206px;
+        height: 40px;
+        border-radius: 8px;
+        padding: 6px;
+        border-color: ${props => props.theme['green-light']};
+        background-color:  ${props => props.theme['background']};
+        color: ${props => props.theme['text']};
+   }
+
 `
 
-export const MedicItem = styled.div`
+export const PatientItem = styled.div`
    display: flex;
    flex-direction: column;
    gap: 1rem;
    
-   .Medicos{
+   .Patients{
     display: flex;
    }
 

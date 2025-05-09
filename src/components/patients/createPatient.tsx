@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {api}  from '../../lib/axios';
+import { CampPatient, CreatePatientContainer } from './styles';
 
 
 interface Plans {
@@ -47,64 +48,72 @@ export default function CreatePatient() {
       setCpf('');
       setHealthPlan('');
       setBirthDate('');
-    } catch (error) {
-      console.error(error);
+    }  catch (error: any) {
+      if (error.response) {
+        console.error('Erro de validação:', error.response.data);
+        alert(JSON.stringify(error.response.data, null, 2)); // mostra os problemas
+      } else {
+        console.error(error);
+        alert('Erro inesperado ao cadastrar médico.');
+      }
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow mt-8">
-      <h3 className="text-lg font-semibold">Cadastrar Paciente</h3>
+    <CreatePatientContainer>
+      <form onSubmit={handleSubmit}>
+        <CampPatient>
 
-      <div>
-        <label className="block mb-1">Nome</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Nome"
-          className="w-full border p-2 rounded"
-        />
-      </div>
+        <div>
+          <label className="block mb-1">Nome</label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nome"
+            className="w-full border p-2 rounded"
+          />
+        </div>
 
-      <div>
-        <label className="block mb-1">CPF</label>
-        <input
-          value={cpf}
-          onChange={(e) => setCpf(e.target.value)}
-          placeholder="CPF"
-          className="w-full border p-2 rounded"
-        />
-      </div>
+        <div>
+          <label>CPF</label>
+          <input
+            value={cpf}
+            onChange={(e) => setCpf(e.target.value)}
+            placeholder="CPF"
+            className="w-full border p-2 rounded"
+          />
+        </div>
 
-      <div>
-        <label className="block mb-1">Plano de Saúde</label>
-        <select
-          value={health_plan}
-          onChange={(e) => setHealthPlan(e.target.value)}
-          className="w-full border p-2 rounded"
-        >
-          <option value="">Selecione um plano</option>
-          {plans.map((plan) => (
-            <option key={plan.id} value={plan.id}>
-              {plan.name}
-            </option>
-          ))}
-        </select>
-      </div>
+        <div>
+          <label>Plano de Saúde</label>
+          <select
+            value={health_plan}
+            onChange={(e) => setHealthPlan(e.target.value)}
+            className='HealthPlan'
+          >
+            <option value="">Selecione um plano</option>
+            {plans.map((plan) => (
+              <option key={plan.id} value={plan.id}>
+                {plan.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div>
-        <label className="block mb-1">Data de Nascimento</label>
-        <input
-          type="date"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          className="w-full border p-2 rounded"
-        />
-      </div>
+        <div>
+          <label>Data de Nascimento</label>
+          <input
+            type="date"
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
+          />
+        </div>
 
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        Salvar
-      </button>
-    </form>
+        </CampPatient>
+        <div className='ButtonPatient'>
+          <button type="submit">Criar Paciente</button>
+        </div>
+      </form>
+    </CreatePatientContainer>
   );
 }

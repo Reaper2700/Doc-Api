@@ -18,8 +18,8 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     :focus {
-        border: 2px solid ${(props) => props.theme['purple-light']};
-        box-shadow: 0 0 4px ${(props) => props.theme['purple-light']};
+        border: 2px solid ${(props) => props.theme['green-light']};
+        box-shadow: 0 0 4px ${(props) => props.theme['background']};
     }
 
     body {
@@ -28,6 +28,8 @@ export const GlobalStyle = createGlobalStyle`
         -webkit-font-smoothing: antialiased;
         font-size: 16px;
         line-height: 1.5;    
+        height: 100%;
+        margin: 0;
     }
 
     body, input, textarea, button {

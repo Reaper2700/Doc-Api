@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {api}  from '../../lib/axios';
+import { CampMedic, CreateMedicContainer } from './stylesCreate';
 
 export default function CreateMedic() {
   const [name, setName] = useState<string>('');
@@ -12,6 +13,11 @@ export default function CreateMedic() {
     try {
       await api.post('/medic', { name, cpf, crm, birthDate });
       alert('Médico cadastrado!');
+
+      setName('');
+      setCpf('');
+      setCrm('');
+      setBirthDate('');
     } catch (error: any) {
       if (error.response) {
         console.error('Erro de validação:', error.response.data);
@@ -24,12 +30,34 @@ export default function CreateMedic() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome" />
-      <input value={cpf} onChange={(e) => setCpf(e.target.value)} placeholder="CPF" />
-      <input value={crm} onChange={(e) => setCrm(e.target.value)} placeholder="CRM" />
-      <input value={birthDate} onChange={(e) => setBirthDate(e.target.value)} placeholder="Data de Nascimento" />
-      <button type="submit">Salvar</button>
-    </form>
+    <CreateMedicContainer>
+      <form onSubmit={handleSubmit}>
+        <CampMedic>
+          <div className='Item'>
+            <label>Nome</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome" />
+          </div>
+          <div>
+            <label>CRM</label>
+            <input value={crm} onChange={(e) => setCrm(e.target.value)} placeholder="CRM" />
+          </div>
+          <div>
+          <label>CPF</label>
+            <input value={cpf} onChange={(e) => setCpf(e.target.value)} placeholder="CPF" />
+          </div>
+          <div>
+          <label>Data de Nascimento</label>
+          <input
+            type="date"
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
+          />
+        </div>
+        </CampMedic>
+        <div className='ButtonMedic'>
+          <button type="submit">Criar Médico</button>
+        </div>
+      </form>
+    </CreateMedicContainer>
   );
 }

@@ -2,15 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { api } from '../../lib/axios';
 import { FaTrash, FaEdit } from 'react-icons/fa';
-import { ListMedic } from './stylesCreate';
+import { Buttons, HeaderMedicContainer, ListMedic, MedicContainer, MedicItem } from './stylesCreate';
 import CreateMedic from './createMedic';
+import Medic from "../../assets/doc.png"
+import { PencilSimpleLine, Trash } from '@phosphor-icons/react';
+import { DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger, Root } from '@radix-ui/react-dialog';
+import { EditMedic } from './Modal/EditMedic';
 
 interface Medic {
   id: number;
   name: string;
   cpf: string;
   crm: string;
-  birthDate: string;
+  birthDate: number;
 }
 
 export default function ListMedics() {
@@ -65,17 +69,7 @@ export default function ListMedics() {
       return;
     }
 
-    try {
-      await api.patch(`/medic/${originalMedic.id}`, updatedFields);
-      alert('Médico atualizado com sucesso!');
-      fetchMedics();
-      reset();
-      setEditingId(null);
-      setOriginalMedic(null);
-    } catch (error) {
-      console.error(error);
-      alert('Erro ao atualizar médico.');
-    }
+    
   };
 
   const handleEdit = (medic: Medic) => {
@@ -86,73 +80,53 @@ export default function ListMedics() {
     });
   };
 
-  if (loading) return <p className="text-center">Carregando...</p>;
-
+  if (loading) return <p>Carregando...</p>;
+  
+  type Props = {
+    dataString: string
+  }
   return (
-    <div>
-    <ListMedic>
-    <div>
-      <h2>Lista de Médicos</h2>
-      <ul>
-        {medics.map(medic => (
-          <li key={medic.id} className="flex justify-between items-center bg-gray-100 p-3 rounded shadow">
-            <span>{medic.name} - {medic.crm} - {medic.cpf} - {medic.birthDate}</span>
-            <div className="space-x-2">
-              <button onClick={() => handleEdit(medic)} className="text-blue-500 hover:text-blue-700">
-                <FaEdit />
-              </button>
-              <button onClick={() => deleteMedic(medic.id)} className="text-red-500 hover:text-red-700">
-                <FaTrash />
-              </button>
+    <MedicContainer>
+      <div>
+        <HeaderMedicContainer>
+          <div className='Name'>
+            <img src={Medic}/>
+            <h2>Lista de Médicos</h2>
+          </div>
+          <h3>Quantidade de Médicos: {medics.length}</h3>
+        </HeaderMedicContainer>
+        <ListMedic>
+        <MedicItem>
+          {medics.map(medic => (
+            <div className='Medicos' key={medic.id}>
+              <span>{medic.name} - {medic.crm} - {medic.cpf} - {new Date(medic.birthDate).toLocaleDateString()}</span>
+              <Buttons>
+                <Root>
+                  <DialogTrigger asChild>
+                    <button onClick={() => handleEdit(medic)}>
+                    <PencilSimpleLine size={20} />
+                    </button>
+                </DialogTrigger>
+                  <EditMedic
+                    medic={originalMedic}
+                    onCancel={() =>setOriginalMedic(null)}
+                    onSuccess={() => {
+                      fetchMedics();
+                      setOriginalMedic(null);
+                    }}
+                    />
+                </Root>
+
+                <button onClick={() => deleteMedic(medic.id)}>
+                  <Trash size={20} />
+                </button>
+              </Buttons>
             </div>
-          </li>
-        ))}
-      </ul>
-
-      {editingId && (
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <h3>Editar Médico</h3>
-
-          <input type="hidden" {...register('id')} />
-
-          <div>
-            <label>Nome</label>
-            <input className="w-full border p-2 rounded" {...register('name', { required: true })} />
-            {errors.name && <p>Nome é obrigatório</p>}
-          </div>
-
-          <div>
-            <label>CRM</label>
-            <input {...register('crm', { required: true })} />
-            {errors.crm && <p>CRM é obrigatório</p>}
-          </div>
-
-          <div>
-            <label className="block mb-1">CPF</label>
-            <input className="w-full border p-2 rounded" {...register('cpf', { required: true })} />
-            {errors.cpf && <p className="text-red-500 text-sm">CPF é obrigatório</p>}
-          </div>
-
-          <div>
-            <label className="block mb-1">Data de Nascimento</label>
-            <input type="date" className="w-full border p-2 rounded" {...register('birthDate', { required: true })} />
-            {errors.birthDate && <p className="text-red-500 text-sm">Data de nascimento é obrigatória</p>}
-          </div>
-
-          <div className="flex gap-4">
-            <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-              Atualizar
-            </button>
-            <button type="button" onClick={() => { reset(); setEditingId(null); setOriginalMedic(null); }}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">
-              Cancelar
-            </button>
-          </div>
-        </form>
-      )}
+          ))}
+        </MedicItem>
+        </ListMedic>
       <CreateMedic/>
     </div>
-    </ListMedic>
-    </div>
+    </MedicContainer>
   );
 }
