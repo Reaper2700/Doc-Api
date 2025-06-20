@@ -109,4 +109,41 @@ export class PrismaMedicRepository implements MedicRepository {
       throw err
     }
   }
+
+  async filterMedic(
+    name?: string,
+    cpf?: string,
+    birthDate?: Date | string,
+  ): Promise<Medic[]> {
+    try {
+      let baseQuery = 'SELECT * FROM "Medic"'
+      const conditions: string[] = []
+      const values: any[] = []
+
+      if (name !== undefined) {
+        values.push(`%${name}%`)
+        conditions.push(`name ILIKE $${values.length}`)
+      }
+
+      if (cpf !== undefined) {
+        values.push(cpf)
+        conditions.push(`cpf = $${values.length}`)
+      }
+
+      if (birthDate !== undefined) {
+        values.push(birthDate)
+        conditions.push(`"birthDate" = $${values.length}`)
+      }
+
+      if (conditions.length > 0) {
+        baseQuery += ' WHERE ' + conditions.join(' AND ')
+      }
+
+      const res = await query(baseQuery, values)
+      return res.rows
+    } catch (err) {
+      console.error('Erro ao buscar Médico', err)
+      return []
+    }
+  }
 }

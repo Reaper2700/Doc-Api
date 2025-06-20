@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z, ZodError } from 'zod'
 
-import { PlansRepository } from '../repositories/Plans-patient/patient-repository'
+import { PlansRepository } from '../repositories/Plans-patient/plan-repository'
 import { DeletePlansUseCase } from '../use-cases/deletePlans'
 import { IdExistPlan } from '../Erros/IdExist'
 

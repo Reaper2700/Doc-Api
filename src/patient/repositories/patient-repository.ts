@@ -15,4 +15,10 @@ export interface PatientRepository {
   findById(id: string): Promise<Patient | null>
   update(id: string, data: Partial<PatientSchema>): Promise<Patient>
   delete(id: string): Promise<Patient>
+
+  filterForPlan(
+    name?: string,
+    cpf?: string,
+    health_plan?: string,
+  ): Promise<Patient[]>
 }

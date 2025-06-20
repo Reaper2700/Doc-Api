@@ -15,4 +15,10 @@ export interface MedicRepository {
   findById(id: string): Promise<Medic | null>
   update(id: string, data: Partial<dataCreateSchema>): Promise<Medic>
   delete(id: string): Promise<Medic>
+
+  filterMedic(
+    name?: string,
+    cpf?: string,
+    birthDate?: Date | string,
+  ): Promise<Medic[]>
 }

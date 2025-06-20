@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Patient } from '@prisma/client'
 import { PatientRepository, PatientSchema } from '../patient-repository'
 import { isValidUUID } from '../../../lib/prisma'
@@ -107,6 +109,43 @@ export class PrismaPatientRepository implements PatientRepository {
     } catch (err) {
       console.error('Erro ao deletar paciente:', err)
       throw err
+    }
+  }
+
+  async filterForPlan(
+    name?: string,
+    cpf?: string,
+    health_plan?: string,
+  ): Promise<Patient[]> {
+    try {
+      let baseQuery = 'SELECT * FROM "Patient"'
+      const conditions: string[] = []
+      const values: any[] = []
+
+      if (name !== undefined) {
+        values.push(`%${name}%`)
+        conditions.push(`name ILIKE $${values.length}`)
+      }
+
+      if (cpf !== undefined) {
+        values.push(cpf)
+        conditions.push(`cpf = $${values.length}`)
+      }
+
+      if (health_plan !== undefined) {
+        values.push(health_plan)
+        conditions.push(`"health_plan" = $${values.length}`)
+      }
+
+      if (conditions.length > 0) {
+        baseQuery += ' WHERE ' + conditions.join(' AND ')
+      }
+
+      const res = await query(baseQuery, values)
+      return res.rows
+    } catch (err) {
+      console.error('Erro ao buscar Patient:', err)
+      return []
     }
   }
 }

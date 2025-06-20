@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-constructor */
 import { PLANS } from '../../../db/db'
-import { PlansRepository } from '../repositories/Plans-patient/patient-repository'
+import { PlansRepository } from '../repositories/Plans-patient/plan-repository'
 
 interface ListPlansUseCaseResponse {
   plans: PLANS[]

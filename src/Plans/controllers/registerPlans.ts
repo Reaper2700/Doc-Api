@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z, ZodError } from 'zod'
-import { PlansRepository } from '../repositories/Plans-patient/patient-repository'
+import { PlansRepository } from '../repositories/Plans-patient/plan-repository'
 import { RegisterPlansUseCase } from '../use-cases/registerPlans'
 
 export async function registerPlans(

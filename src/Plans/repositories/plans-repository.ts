@@ -4,7 +4,7 @@ export interface PlansSchema {
   id?: string
   name: string
   varbase: number
-  createAt?: Date | string
+  createat?: Date | string
 }
 
 export interface PlansRepositorySchema {
@@ -13,4 +13,8 @@ export interface PlansRepositorySchema {
   findById(id: string): Promise<PLANS | null>
   update(id: string, data: Partial<PlansSchema>): Promise<PLANS>
   delete(id: string): Promise<PLANS>
+
+  varFilter(varbase?: number, name?: string): Promise<PLANS[]>
 }
+
+// filtro de valor variavel
