@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {api}  from '../../lib/axios';
 import { CampPatient, CreatePatientContainer } from './styles';
+import { usePatients } from '../../context/Patients/PatientsProvider';
 
 
 interface Plans {
@@ -16,12 +17,13 @@ export default function CreatePatient() {
   const [birthDate, setBirthDate] = useState<string>('')
   
   const [plans, setPlans] = useState<Plans[]>([])
-
+  const {fetchPatients} = usePatients()
   useEffect(() => {
     const fetchPlans = async() =>{
       try{
         const response = await api.get('/plans')
         setPlans(response.data)
+        console.log("dados recebidos", response.data)
       }catch (error) {
         console.error('Erro ao buscar planos:', error);
       }
@@ -44,10 +46,12 @@ export default function CreatePatient() {
       await api.post('/patient', { name, cpf, health_plan, birthDate });
       alert('Paciente cadastrado!');
 
+      fetchPatients()
       setName('');
       setCpf('');
       setHealthPlan('');
       setBirthDate('');
+
     }  catch (error: any) {
       if (error.response) {
         console.error('Erro de validação:', error.response.data);

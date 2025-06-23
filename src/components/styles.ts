@@ -19,4 +19,17 @@ export const HomePageContainer = styled.div`
     gap: 2rem;
     background-color: ${props => props.theme['background']};
 
+    .button{
+        width: 145px;
+        height: 50px;
+        border-radius: 8px;
+
+        background-color:  ${props => props.theme['green-light']};
+        cursor: pointer;
+        
+        &:hover{
+        transition: 0.4s;
+        background-color: ${props => props.theme["green"]};
+        }
+    }
 `

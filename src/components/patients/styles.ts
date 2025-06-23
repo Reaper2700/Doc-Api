@@ -4,7 +4,7 @@ import styled from "styled-components";
 export const PatientContainer =  styled.div`
     width: 100%;
     max-width: 1120px;
-    height: 640px;
+    height: 740px;
     
     display: flex;
     align-items: center;
@@ -24,7 +24,8 @@ export const HeaderPatientContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: start;
-    
+    padding-top: 40px;
+
     .Name{
         display: flex;
         padding-bottom: 2rem;
@@ -45,9 +46,28 @@ export const HeaderPatientContainer = styled.div`
 
 
 export const ListPatient = styled.div`
+    padding-top: 20px;
+    padding-bottom: 20px;
     width: 100%;
     max-width: 800px;
-    height: 220px;
+    height: auto;
+    max-height: 500px; /* limite de altura */
+    overflow-y: auto;
+
+     &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${props => props.theme["background"]};
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #00b37e; /* exemplo com verde */
+    border-radius: 10px;
+    border: 2px solid #f0f0f0;
+  }
 `
 
 

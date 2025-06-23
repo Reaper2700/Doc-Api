@@ -18,12 +18,12 @@ export const GlobalStyle = createGlobalStyle`
     }
 
     :focus {
-        border: 2px solid ${(props) => props.theme['green-light']};
-        box-shadow: 0 0 4px ${(props) => props.theme['background']};
+        border: 2px solid ${(props) => props.theme['gray-600']};
+        box-shadow: 0 0 4px ${(props) => props.theme['gray-600']};
     }
 
     body {
-        background-color: ${(props) => props.theme['background']};
+        background-color: ${(props) => props.theme['gray-600']};
         
         -webkit-font-smoothing: antialiased;
         font-size: 16px;

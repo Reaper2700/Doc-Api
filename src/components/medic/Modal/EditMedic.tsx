@@ -1,4 +1,4 @@
-import { DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogTitle } from "@radix-ui/react-dialog";
+import { DialogClose, DialogPortal, DialogTitle } from "@radix-ui/react-dialog";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 

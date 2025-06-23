@@ -3,7 +3,8 @@ import styled from "styled-components";
 export const MedicContainer =  styled.div`
     width: 100%;
     max-width: 1120px;
-    height: 640px;
+    min-height: 640px;
+    max-height: auto;
     
     display: flex;
     align-items: center;
@@ -24,6 +25,7 @@ export const HeaderMedicContainer = styled.div`
     justify-content: space-between;
     align-items: start;
     
+    padding-top: 20px;
     .Name{
         display: flex;
         padding-bottom: 2rem;
@@ -46,9 +48,25 @@ export const HeaderMedicContainer = styled.div`
 export const ListMedic = styled.div`
     width: 100%;
     max-width: 800px;
-    height: 220px;
-`
+    height: auto;
+    max-height: 500px; /* limite de altura */
+    overflow-y: auto;
 
+     &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${props => props.theme["background"]};
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #00b37e; /* exemplo com verde */
+    border-radius: 10px;
+    border: 2px solid #f0f0f0;
+  }
+`
 
 ///////////// create medic
 
@@ -61,7 +79,9 @@ export const CreateMedicContainer = styled.div`
     max-width: 1000px;
     height: auto;
     padding-right: 650px;
-    
+    padding-top: 20px;
+    padding-bottom: 20px;
+
     .ButtonMedic{
         padding-top: 26px;
         padding-left: 1rem;

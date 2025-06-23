@@ -5,7 +5,7 @@ import { DialogClose, DialogPortal, DialogTitle } from "@radix-ui/react-dialog";
 import { Content, Overlay } from "../../medic/Modal/styles";
 
 interface Patient {
-  id: number;
+  id: string; // Corrigido: id agora é string
   name: string;
   cpf: string;
   health_plan: number;
@@ -19,30 +19,31 @@ interface EditPatientProps {
 }
 
 interface Plans {
-  id: number,
-  name: string,
-  varbase:number,
+  id: number;
+  name: string;
+  varbase: number;
 }
 
-export function EditPatient({patient, onCancel, onSuccess}:EditPatientProps){
-    const [plans, setPlans] = useState<Plans[]>([])
-    const [loading, setLoading] = useState<boolean>(true);
-      const fetchPlans= async () => {
-        try {
-          const res = await api.get('/plans');
-          setPlans(res.data);
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-    
-      useEffect(() => {
-        fetchPlans();
-      }, []);
+export function EditPatient({ patient, onCancel, onSuccess }: EditPatientProps) {
+  const [plans, setPlans] = useState<Plans[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-    const {
+  const fetchPlans = async () => {
+    try {
+      const res = await api.get("/plans");
+      setPlans(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const {
     register,
     handleSubmit,
     reset,
@@ -52,25 +53,26 @@ export function EditPatient({patient, onCancel, onSuccess}:EditPatientProps){
   });
 
   useEffect(() => {
-    if (patient){
-       reset({...patient,
-      birthDate: new Date(patient.birthDate).toISOString().split("T")[0]
-    });
-   }
+    if (patient) {
+      reset({
+        ...patient,
+        birthDate: new Date(patient.birthDate).toISOString().split("T")[0],
+      });
+    }
   }, [patient]);
 
   const onSubmit = async (data: Patient) => {
     const updatedData: Partial<Record<keyof Patient, string | number>> = {};
-     
-    for (const key in dirtyFields) {
-    const typedKey = key as keyof Patient;
 
-    if (typedKey === "birthDate") {
-      updatedData[typedKey] = new Date(data.birthDate).getTime();
-    } else {
-      updatedData[typedKey] = data[typedKey];
+    for (const key in dirtyFields) {
+      const typedKey = key as keyof Patient;
+
+      if (typedKey === "birthDate") {
+        updatedData[typedKey] = new Date(data.birthDate).getTime();
+      } else {
+        updatedData[typedKey] = data[typedKey];
+      }
     }
-  }
 
     try {
       await api.patch(`/patient/${data.id}`, updatedData);
@@ -78,11 +80,11 @@ export function EditPatient({patient, onCancel, onSuccess}:EditPatientProps){
       onSuccess();
     } catch (error: any) {
       if (error.response) {
-        console.error('Erro de validação:', error.response.data);
-        alert(JSON.stringify(error.response.data, null, 2)); // mostra os problemas
+        console.error("Erro de validação:", error.response.data);
+        alert(JSON.stringify(error.response.data, null, 2));
       } else {
         console.error(error);
-        alert('Erro inesperado ao cadastrar médico.');
+        alert("Erro inesperado ao atualizar paciente.");
       }
     }
   };
@@ -93,7 +95,7 @@ export function EditPatient({patient, onCancel, onSuccess}:EditPatientProps){
     <DialogPortal>
       <Overlay />
       <Content>
-        <DialogTitle>Editar Médico</DialogTitle>
+        <DialogTitle>Editar Paciente</DialogTitle>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <input type="hidden" {...register("id")} />
@@ -108,17 +110,17 @@ export function EditPatient({patient, onCancel, onSuccess}:EditPatientProps){
           </div>
 
           <div>
-              <label>plano de saúde</label>
-              <select {...register('health_plan', { required: true })} >
+            <label>Plano de Saúde</label>
+            <select {...register("health_plan", { required: true })}>
               <option value="">Selecione um plano</option>
-              {plans.map((plan) =>(
+              {plans.map((plan) => (
                 <option key={plan.id} value={plan.id}>
                   {plan.name}
                 </option>
               ))}
-              {errors.health_plan && <p>Plano é obrigatorio</p>}
-              </select>
-            </div>
+            </select>
+            {errors.health_plan && <p>Plano é obrigatório</p>}
+          </div>
 
           <div>
             <label>CPF</label>
@@ -130,22 +132,23 @@ export function EditPatient({patient, onCancel, onSuccess}:EditPatientProps){
           </div>
 
           <div>
-              <label>Data de Nascimento</label>
-              <input type="date" {...register('birthDate', { required: true })} />
-              {errors.birthDate && <p>Data de nascimento é obrigatória</p>}
-            </div>
+            <label>Data de Nascimento</label>
+            <input type="date" {...register("birthDate", { required: true })} />
+            {errors.birthDate && <p>Data de nascimento é obrigatória</p>}
+          </div>
 
-          <div>
-            <button
-              type="submit">
+          <div className="flex gap-2 mt-4">
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
               Atualizar
             </button>
             <button
               type="button"
+              className="bg-gray-300 px-4 py-2 rounded"
               onClick={() => {
                 reset();
                 onCancel();
-              }}>
+              }}
+            >
               Cancelar
             </button>
           </div>

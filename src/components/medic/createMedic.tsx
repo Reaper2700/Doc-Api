@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {api}  from '../../lib/axios';
+import { api } from '../../lib/axios';
 import { CampMedic, CreateMedicContainer } from './stylesCreate';
+import { useMedics } from '../../context/Medics/MedicProvider';
 
 export default function CreateMedic() {
+  const { fetchMedic } = useMedics()
   const [name, setName] = useState<string>('');
   const [cpf, setCpf] = useState<string>('');
   const [crm, setCrm] = useState<string>('');
@@ -14,6 +16,7 @@ export default function CreateMedic() {
       await api.post('/medic', { name, cpf, crm, birthDate });
       alert('Médico cadastrado!');
 
+      fetchMedic()
       setName('');
       setCpf('');
       setCrm('');
@@ -42,17 +45,17 @@ export default function CreateMedic() {
             <input value={crm} onChange={(e) => setCrm(e.target.value)} placeholder="CRM" />
           </div>
           <div>
-          <label>CPF</label>
+            <label>CPF</label>
             <input value={cpf} onChange={(e) => setCpf(e.target.value)} placeholder="CPF" />
           </div>
           <div>
-          <label>Data de Nascimento</label>
-          <input
-            type="date"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-          />
-        </div>
+            <label>Data de Nascimento</label>
+            <input
+              type="date"
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+            />
+          </div>
         </CampMedic>
         <div className='ButtonMedic'>
           <button type="submit">Criar Médico</button>
