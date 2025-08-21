@@ -31,3 +31,8 @@ export interface Consultation {
   patient_id: string
   notes: Text
 }
+
+export interface MedicPlan {
+  id_plan: string
+  id_medic: string
+}

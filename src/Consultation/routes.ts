@@ -8,6 +8,7 @@ import { FilterConsultation } from './controllers/filterConsultation'
 import { exportToExcel } from './exportToExcel'
 import { query } from '../../db/db'
 import ExcelJS from 'exceljs'
+import { exportToExcelFilter } from './exportToExcelFilter'
 
 export async function appRoutesConsultation(app: FastifyInstance) {
   app.post('/consultation', registerConsultation)
@@ -16,6 +17,25 @@ export async function appRoutesConsultation(app: FastifyInstance) {
   app.patch('/consultation/:id', UpdateConsultation)
 
   app.get('/consultation/filter', FilterConsultation)
+
+  app.get('/consultation/filter/export', async (req, res) => {
+    try {
+      // Extraia os parâmetros da query corretamente, com tipagem explícita
+      const { consultation_data, medic_id } = req.query as {
+        consultation_data?: string
+        medic_id?: string
+      }
+
+      // Chame exportToExcelFilter passando req e res para ela ter acesso aos filtros
+      await exportToExcelFilter(req, res, {
+        consultation_data,
+        medic_id,
+      })
+    } catch (error) {
+      console.error('Erro ao exportar dados:', error)
+      res.status(500).send('Erro interno ao exportar os dados')
+    }
+  })
 
   app.get('/consultation/export', async (req, res) => {
     try {

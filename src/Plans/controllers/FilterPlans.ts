@@ -1,7 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z, ZodError } from 'zod'
-import { PlansRepository } from '../repositories/Plans-patient/plan-repository'
-import { FilterPlansUseCase } from '../use-cases/FilterPlans'
+import { FilterPlanData } from '../../utils/filterPlan'
 
 export async function FilterPlans(
   request: FastifyRequest<{ Querystring: { name?: string; varbase?: number } }>,
@@ -10,23 +9,36 @@ export async function FilterPlans(
   const filterPlansParamsSchema = z.object({
     name: z.coerce.string(),
     varbase: z.coerce.number().nonnegative().min(100).optional(),
+    id: z.coerce.string().optional(),
   })
 
   try {
-    const { name, varbase } = await filterPlansParamsSchema.parseAsync(
+    const { name, varbase, id } = await filterPlansParamsSchema.parseAsync(
       request.query,
     )
 
-    const plansRepository = new PlansRepository()
-    const filterPlansUseCase = new FilterPlansUseCase(plansRepository)
-
-    const { plans } = await filterPlansUseCase.execute({
+    const { plans, medics } = await FilterPlanData({
       name,
       varbase,
+      id,
     })
     console.log(`[FilterPlans] name: ${name} varbase: ${varbase}`)
 
-    return reply.status(200).send({ plans })
+    if (plans.length === 0) {
+      return reply.status(404).send({
+        message: `No Plans found this medic`,
+      })
+    }
+
+    if (id && medics.length === 0) {
+      return reply.status(404).send({
+        message: `No Medics found for plan`,
+      })
+    }
+
+    plans.push(...medics)
+
+    return reply.status(200).send({ plans, medics })
   } catch (err) {
     if (err instanceof ZodError) {
       return reply

@@ -1,53 +1,74 @@
-/* eslint-disable camelcase */
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z, ZodError } from 'zod'
-import { PrismaMedicRepository } from '../repositories/prisma/prisma-medic-repository'
-import { FilterMedicUseCase } from '../use-cases/filter-medic-usecase'
+import { filterMedicDate } from '../../utils/filterMedic'
 
 export async function FilterMedic(
-  request: FastifyRequest<{ Querystring: { birthDate: string } }>,
+  request: FastifyRequest<{
+    Querystring: {
+      name?: string
+      cpf?: string
+      birthDate?: string
+      id?: string
+      olderThan50?: string // virá como string na query
+    }
+  }>,
   reply: FastifyReply,
 ) {
   const filterMedicParamsSchema = z.object({
-    name: z.coerce.string().optional(),
-    cpf: z.coerce.string().optional(),
-    birthDate: z.coerce.string().optional(),
+    name: z.string().optional(),
+    cpf: z.string().optional(),
+    birthDate: z.string().optional(),
+    id: z.string().optional(),
+    olderThan50: z
+      .string()
+      .optional()
+      .transform((val) => val === 'true'), // transforma string 'true' para boolean true
   })
 
   try {
-    const { name, cpf, birthDate } = await filterMedicParamsSchema.parseAsync(
-      request.query,
-    )
+    const { name, cpf, birthDate, id, olderThan50 } =
+      await filterMedicParamsSchema.parseAsync(request.query)
 
-    const medicRepository = new PrismaMedicRepository()
-    const filterMedicUseCase = new FilterMedicUseCase(medicRepository)
-
-    const { medics } = await filterMedicUseCase.execute({
+    const { medics, plans } = await filterMedicDate({
       name,
       cpf,
       birthDate,
+      id,
+      olderThan50,
     })
+
     console.log(
-      `[FilterMedic] name: ${name} cpf: ${cpf} bithDate: ${birthDate}`,
+      `[FilterMedic] name: ${name} cpf: ${cpf} birthDate: ${birthDate} id: ${id} olderThan50: ${olderThan50}`,
     )
 
     if (medics.length === 0) {
       return reply.status(404).send({
-        message: `No Medics found for plan: ${birthDate}`,
+        message: 'No medics found matching the criteria',
       })
     }
 
-    return reply.status(200).send({ medics })
+    if (id && plans.length === 0) {
+      return reply.status(404).send({
+        message: 'No plans found for the specified medic',
+      })
+    }
+
+    // Não faça medics.push(...plans), retorne separado
+
+    return reply.status(200).send({
+      medics,
+      plans,
+    })
   } catch (err) {
     if (err instanceof ZodError) {
       return reply
         .status(400)
-        .send({ message: 'erro de validação', issues: err.errors })
+        .send({ message: 'Validation error', issues: err.errors })
     }
 
-    console.error('Error unspected', err)
+    console.error('Unexpected error', err)
     return reply.status(500).send({
-      message: 'Error intern of server',
+      message: 'Internal server error',
     })
   }
 }

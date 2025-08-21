@@ -3,7 +3,6 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { z, ZodError } from 'zod'
 import { PrismaMedicRepository } from '../repositories/prisma/prisma-medic-repository'
 import { RegisterMedicUseCase } from '../use-cases/create-medic-usecase'
-import { isValidCPF } from '../../patient/Erros/isValidCPF'
 import { cpfExistingMedic } from '../Erros/cpfExist'
 import { CRMExistMedic } from '../Erros/crmExist'
 
@@ -17,9 +16,6 @@ export async function registerMedicUseCase(
       .string()
       .min(11)
       .max(11)
-      .refine(isValidCPF, {
-        message: 'CPF invalido',
-      })
       .superRefine(async (cpf, ctx) => {
         const exists = await cpfExistingMedic(cpf)
         if (exists) {
@@ -41,13 +37,17 @@ export async function registerMedicUseCase(
     birthDate: z
       .string()
       .refine((val) => !isNaN(Date.parse(val)), {
-        message: 'Invalid date format',
+        message: 'Formato de data inválido',
       })
       .transform((val) => new Date(val)),
+
+    plans: z
+      .array(z.string().uuid())
+      .nonempty({ message: 'É necessário selecionar ao menos um plano' }), // <- Novo campo
   })
 
   try {
-    const { name, cpf, crm, birthDate } =
+    const { name, cpf, crm, birthDate, plans } =
       await registerMedicBodySchema.parseAsync(request.body)
 
     const medicRepository = new PrismaMedicRepository()
@@ -57,8 +57,11 @@ export async function registerMedicUseCase(
       name,
       cpf,
       crm,
-      birthDate: new Date(birthDate),
+      birthDate,
+      plans, // <- Enviando os planos para o use case
     })
+
+    return reply.status(201).send()
   } catch (err) {
     if (err instanceof ZodError) {
       return reply
@@ -71,5 +74,4 @@ export async function registerMedicUseCase(
       message: 'Erro interno do servidor',
     })
   }
-  return reply.status(201).send()
 }

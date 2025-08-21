@@ -20,5 +20,6 @@ export interface PatientRepository {
     name?: string,
     cpf?: string,
     health_plan?: string,
+    olderThan50?: boolean,
   ): Promise<Patient[]>
 }

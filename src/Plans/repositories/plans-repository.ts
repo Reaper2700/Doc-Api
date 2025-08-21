@@ -1,3 +1,4 @@
+import { Medic } from '@prisma/client'
 import { PLANS } from '../../../db/db'
 
 export interface PlansSchema {
@@ -15,6 +16,6 @@ export interface PlansRepositorySchema {
   delete(id: string): Promise<PLANS>
 
   varFilter(varbase?: number, name?: string): Promise<PLANS[]>
-}
 
-// filtro de valor variavel
+  MedicsByIdPlan(id?: string): Promise<Medic[]>
+}

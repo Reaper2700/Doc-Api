@@ -1,31 +1,60 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Medic } from '@prisma/client'
 import { dataCreateSchema, MedicRepository } from '../medic-repository'
-import { query } from '../../../../db/db'
+import { PLANS, query } from '../../../../db/db'
 import { isValidUUID } from '../../../lib/prisma'
 
+interface CreateMedicResult {
+  medic: Medic
+  plan: any // ou defina um tipo específico para o plano se tiver
+}
+
 export class PrismaMedicRepository implements MedicRepository {
-  async create(data: dataCreateSchema): Promise<Medic> {
+  async create(data: dataCreateSchema): Promise<CreateMedicResult> {
     try {
       const res = await query(
         'INSERT INTO "Medic" (name, cpf, crm, "birthDate") VALUES ($1, $2, $3, $4) RETURNING *',
         [data.name, data.cpf, data.crm, data.birthDate],
       )
-      console.log(res.rows)
-      return res.rows[0]
+
+      const newMedic = res.rows[0]
+
+      // Cadastrar múltiplos planos
+      await Promise.all(
+        data.plans.map((planId) =>
+          query('INSERT INTO "MedicPlan" (id_medic, id_plan) VALUES ($1, $2)', [
+            newMedic.id,
+            planId,
+          ]),
+        ),
+      )
+
+      return newMedic
     } catch (err) {
       console.error('Erro ao criar médico:', err)
       throw new Error('Erro ao criar médico')
     }
   }
 
-  async findAll(): Promise<Medic[]> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Medic[]; total: number }> {
     try {
-      const res = await query('SELECT * FROM "Medic"')
+      const offset = (page - 1) * limit
+
+      const res = await query(
+        'SELECT * FROM "Medic" ORDER BY "createAt" DESC LIMIT $1 OFFSET $2',
+        [limit, offset],
+      )
+
+      const countRes = await query('SELECT COUNT(*) FROM "Medic" ')
+
       console.log(res.rows)
-      return res.rows
+      return { data: res.rows, total: parseInt(countRes.rows[0].count, 10) }
     } catch (err) {
       console.error('Erro ao buscar médicos:', err)
-      return []
+      return { data: [], total: 0 }
     }
   }
 
@@ -114,9 +143,10 @@ export class PrismaMedicRepository implements MedicRepository {
     name?: string,
     cpf?: string,
     birthDate?: Date | string,
+    olderThan50?: boolean,
   ): Promise<Medic[]> {
     try {
-      let baseQuery = 'SELECT * FROM "Medic"'
+      let baseQuery = 'SELECT * FROM "Medic" '
       const conditions: string[] = []
       const values: any[] = []
 
@@ -135,11 +165,32 @@ export class PrismaMedicRepository implements MedicRepository {
         conditions.push(`"birthDate" = $${values.length}`)
       }
 
+      if (olderThan50) {
+        conditions.push(
+          `DATE_PART('year', AGE(current_date, "birthDate")) >= 50`,
+        )
+      }
+
       if (conditions.length > 0) {
         baseQuery += ' WHERE ' + conditions.join(' AND ')
       }
 
       const res = await query(baseQuery, values)
+      return res.rows
+    } catch (err) {
+      console.error('Erro ao buscar Médico', err)
+      return []
+    }
+  }
+
+  async filterMedicByPlan(id?: string): Promise<PLANS[]> {
+    try {
+      const res = await query(
+        ` SELECT "PLANS" FROM "PLANS" JOIN "MedicPlan" ON "MedicPlan"."id_plan" = "PLANS"."id"
+        WHERE "MedicPlan"."id_medic" = $1`,
+        [id],
+      )
+
       return res.rows
     } catch (err) {
       console.error('Erro ao buscar Médico', err)

@@ -10,6 +10,7 @@ interface FilterPlansPatientUseCaseRequest {
   name?: string
   cpf?: string
   health_plan?: string
+  olderThan50?: boolean
 }
 
 export class FilterPatientPlansUseCase {
@@ -22,6 +23,7 @@ export class FilterPatientPlansUseCase {
       request.name,
       request.cpf,
       request.health_plan,
+      request.olderThan50,
     )
 
     return { patients }

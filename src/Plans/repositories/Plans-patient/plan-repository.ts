@@ -1,3 +1,4 @@
+import { Medic } from '@prisma/client'
 import { PLANS, query } from '../../../../db/db'
 import { isValidUUID } from '../../../lib/prisma'
 import { PlansRepositorySchema, PlansSchema } from '../plans-repository'
@@ -19,7 +20,7 @@ export class PlansRepository implements PlansRepositorySchema {
 
   async findAll(): Promise<PLANS[]> {
     try {
-      const res = await query('SELECT * FROM "PLANS"')
+      const res = await query('SELECT * FROM "PLANS" ORDER BY "createat"')
       console.log(res.rows)
       return res.rows
     } catch (err) {
@@ -118,11 +119,6 @@ export class PlansRepository implements PlansRepositorySchema {
         conditions.push(`varbase <= $${values.length}`)
       }
 
-      if (name !== undefined) {
-        values.push(`%${name}%`)
-        conditions.push(`name ILIKE $${values.length}`)
-      }
-
       if (conditions.length > 0) {
         baseQuery += ' WHERE ' + conditions.join(' AND ')
       }
@@ -132,6 +128,25 @@ export class PlansRepository implements PlansRepositorySchema {
     } catch (err) {
       console.error('erro ao aplicar filtro', err)
       throw err
+    }
+  }
+
+  async MedicsByIdPlan(id?: string): Promise<Medic[]> {
+    try {
+      const res = await query(
+        `
+      SELECT *
+      FROM "Medic" m
+      JOIN "MedicPlan" mp ON mp."id_medic" = m."id"
+      WHERE mp."id_plan" = $1
+      `,
+        [id],
+      )
+
+      return res.rows
+    } catch (err) {
+      console.error('Erro ao buscar Médico', err)
+      return []
     }
   }
 }

@@ -31,7 +31,9 @@ export class DBConsultationRepository implements ConsultationRepository {
 
   async findAll(): Promise<Consultation[]> {
     try {
-      const res = await query('SELECT * FROM "Consultation"')
+      const res = await query(
+        'SELECT * FROM "Consultation" ORDER BY "consultation_data"',
+      )
       console.log(res.rows)
       return res.rows
     } catch (err) {

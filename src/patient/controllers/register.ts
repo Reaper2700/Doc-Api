@@ -3,7 +3,6 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { z, ZodError } from 'zod'
 import { PrismaPatientRepository } from '../repositories/prisma/prisma-patient-repository'
 import { RegisterUseCase } from '../use-cases/register'
-import { isValidCPF } from '../Erros/isValidCPF'
 import { cpfExisting } from '../Erros/cpfExist'
 
 export async function register(request: FastifyRequest, reply: FastifyReply) {
@@ -13,9 +12,6 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
       .string()
       .min(11)
       .max(11)
-      .refine(isValidCPF, {
-        message: 'CPF inválido',
-      })
       .refine(
         async (cpf) => {
           return !(await cpfExisting(cpf)) // Se existir, dá erro

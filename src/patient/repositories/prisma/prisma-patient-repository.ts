@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Patient } from '@prisma/client'
@@ -9,7 +10,7 @@ export class PrismaPatientRepository implements PatientRepository {
   async create(data: PatientSchema): Promise<Patient> {
     try {
       const res = await query(
-        'INSERT INTO "Patient" (name, cpf, "health_plan", "birthDate") VALUES($1, $2, $3, $4) RETURNING *',
+        'INSERT INTO "Patient" (name, cpf, "health_plan", "birthDate") VALUES($1, $2, $3, $4) RETURNING * ',
         [data.name, data.cpf, data.health_plan, data.birthDate],
       )
       console.log(res.rows[0])
@@ -22,7 +23,9 @@ export class PrismaPatientRepository implements PatientRepository {
 
   async findAll(): Promise<Patient[]> {
     try {
-      const res = await query('SELECT * FROM "Patient"')
+      const res = await query(
+        'SELECT * FROM "Patient" ORDER BY "createAt" DESC',
+      )
       console.log(res.rows)
       return res.rows
     } catch (err) {
@@ -116,6 +119,7 @@ export class PrismaPatientRepository implements PatientRepository {
     name?: string,
     cpf?: string,
     health_plan?: string,
+    olderThan50?: boolean,
   ): Promise<Patient[]> {
     try {
       let baseQuery = 'SELECT * FROM "Patient"'
@@ -135,6 +139,11 @@ export class PrismaPatientRepository implements PatientRepository {
       if (health_plan !== undefined) {
         values.push(health_plan)
         conditions.push(`"health_plan" = $${values.length}`)
+      }
+      if (olderThan50 === true) {
+        conditions.push(
+          `DATE_PART('year', AGE(current_date, "birthDate")) >= 50`,
+        )
       }
 
       if (conditions.length > 0) {

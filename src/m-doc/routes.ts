@@ -7,6 +7,7 @@ import { FilterMedic } from './controllers/filterMedic'
 import { exportToExcel } from './exportToExcel'
 import ExcelJS from 'exceljs'
 import { query } from '../../db/db'
+import { exportMedicExcel } from './exportToExcelFilter'
 
 export async function appRoutesMedic(app: FastifyInstance) {
   app.post('/medic', registerMedicUseCase)
@@ -15,6 +16,22 @@ export async function appRoutesMedic(app: FastifyInstance) {
   app.delete('/medic/:id', DeleteMedic)
 
   app.get('/medic/filter:name', FilterMedic)
+
+  app.get('/medic/filter/export', async (req, res) => {
+    try {
+      const query = req.query as Record<string, string>
+
+      // Remove filtros com valores vazios
+      const filtered = Object.fromEntries(
+        Object.entries(query).filter(([_, value]) => value?.trim() !== ''),
+      )
+
+      await exportMedicExcel(res, filtered)
+    } catch (error) {
+      console.error('Erro ao exportar médicos:', error)
+      res.status(500).send('Erro interno ao exportar os médicos')
+    }
+  })
 
   app.get('/medic/export', async (req, res) => {
     try {

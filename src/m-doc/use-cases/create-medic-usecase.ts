@@ -7,9 +7,10 @@ interface RegisterMedicUseCaseRequest {
   cpf: string
   crm: string
   birthDate: Date
+  plans: string[] // <-- Adicionado
 }
 
-interface RegisterMedicUseCaseReponse {
+interface RegisterMedicUseCaseResponse {
   medic: Medic
 }
 
@@ -21,12 +22,14 @@ export class RegisterMedicUseCase {
     cpf,
     crm,
     birthDate,
-  }: RegisterMedicUseCaseRequest): Promise<RegisterMedicUseCaseReponse> {
+    plans,
+  }: RegisterMedicUseCaseRequest): Promise<RegisterMedicUseCaseResponse> {
     const medic = await this.medicRepository.create({
       name,
       cpf,
       crm,
       birthDate: new Date(birthDate),
+      plans,
     })
 
     return {
