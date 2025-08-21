@@ -21,16 +21,25 @@ export class PrismaPatientRepository implements PatientRepository {
     }
   }
 
-  async findAll(): Promise<Patient[]> {
+  async findAll(
+    page: number,
+    limit: number,
+  ): Promise<{ data: Patient[]; total: number }> {
     try {
+      const offset = (page - 1) * limit
+
       const res = await query(
-        'SELECT * FROM "Patient" ORDER BY "createAt" DESC',
+        'SELECT * FROM "Patient" ORDER BY "createAt" DESC LIMIT $1 OFFSET $2',
+        [limit, offset],
       )
+
+      const resCount = await query('SELECT COUNT(*) FROM "Patient"')
+
       console.log(res.rows)
-      return res.rows
+      return { data: res.rows, total: parseInt(resCount.rows[0].count, 10) }
     } catch (err) {
       console.error('Erro ao buscar Patient:', err)
-      return []
+      return { data: [], total: 0 }
     }
   }
 

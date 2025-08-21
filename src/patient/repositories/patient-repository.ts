@@ -11,7 +11,10 @@ export interface PatientSchema {
 
 export interface PatientRepository {
   create(data: PatientSchema): Promise<Patient>
-  findAll(): Promise<Patient[]>
+  findAll(
+    page: number,
+    limit: number,
+  ): Promise<{ data: Patient[]; total: number }>
   findById(id: string): Promise<Patient | null>
   update(id: string, data: Partial<PatientSchema>): Promise<Patient>
   delete(id: string): Promise<Patient>
