@@ -18,14 +18,25 @@ export class PlansRepository implements PlansRepositorySchema {
     }
   }
 
-  async findAll(): Promise<PLANS[]> {
+  async findAll(
+    page: number,
+    limit: number,
+  ): Promise<{ data: PLANS[]; total: number }> {
     try {
-      const res = await query('SELECT * FROM "PLANS" ORDER BY "createat"')
+      const offset = (page - 1) * limit
+
+      const res = await query(
+        'SELECT * FROM "PLANS" ORDER BY "createat" DESC  LIMIT $1 OFFSET $2',
+        [limit, offset],
+      )
+
+      const countRes = await query('SELECT COUNT(*) FROM "PLANS"')
+
       console.log(res.rows)
-      return res.rows
+      return { data: res.rows, total: parseInt(countRes.rows[0].count, limit) }
     } catch (err) {
       console.error('Erro ao buscar Planos:', err)
-      return []
+      return { data: [], total: 0 }
     }
   }
 

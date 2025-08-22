@@ -37,8 +37,8 @@ export class PrismaMedicRepository implements MedicRepository {
   }
 
   async findAll(
-    page: number = 1,
-    limit: number = 10,
+    page: number,
+    limit: number,
   ): Promise<{ data: Medic[]; total: number }> {
     try {
       const offset = (page - 1) * limit
@@ -51,7 +51,7 @@ export class PrismaMedicRepository implements MedicRepository {
       const countRes = await query('SELECT COUNT(*) FROM "Medic" ')
 
       console.log(res.rows)
-      return { data: res.rows, total: parseInt(countRes.rows[0].count, 10) }
+      return { data: res.rows, total: parseInt(countRes.rows[0].count, limit) }
     } catch (err) {
       console.error('Erro ao buscar médicos:', err)
       return { data: [], total: 0 }

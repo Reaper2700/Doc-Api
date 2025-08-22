@@ -36,7 +36,7 @@ export class PrismaPatientRepository implements PatientRepository {
       const resCount = await query('SELECT COUNT(*) FROM "Patient"')
 
       console.log(res.rows)
-      return { data: res.rows, total: parseInt(resCount.rows[0].count, 10) }
+      return { data: res.rows, total: parseInt(resCount.rows[0].count, limit) }
     } catch (err) {
       console.error('Erro ao buscar Patient:', err)
       return { data: [], total: 0 }

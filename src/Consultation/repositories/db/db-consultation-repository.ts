@@ -29,16 +29,25 @@ export class DBConsultationRepository implements ConsultationRepository {
     }
   }
 
-  async findAll(): Promise<Consultation[]> {
+  async findAll(
+    page: number,
+    limit: number,
+  ): Promise<{ data: Consultation[]; total: number }> {
     try {
+      const offset = (page - 1) * limit
+
       const res = await query(
-        'SELECT * FROM "Consultation" ORDER BY "consultation_data"',
+        'SELECT * FROM "Consultation" ORDER BY "consultation_data" DESC LIMIT $1 OFFSET $2',
+        [limit, offset],
       )
+
+      const resCount = await query('SELECT COUNT(*) FROM "Consultation" ')
+
       console.log(res.rows)
-      return res.rows
+      return { data: res.rows, total: parseInt(resCount.rows[0].count, limit) }
     } catch (err) {
       console.error('Erro ao requisitar tabela agendamento:', err)
-      throw new Error('Erro ao requisitar tabela agendamento')
+      return { data: [], total: 0 }
     }
   }
 

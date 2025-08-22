@@ -10,7 +10,10 @@ export interface dataCreateSchema {
 
 export interface ConsultationRepository {
   create(data: dataCreateSchema): Promise<Consultation>
-  findAll(): Promise<Consultation[]>
+  findAll(
+    page: number,
+    limit: number,
+  ): Promise<{ data: Consultation[]; total: number }>
   findById(id: string): Promise<Consultation | null>
   update(id: string, data: Partial<dataCreateSchema>): Promise<Consultation>
   delete(id: string): Promise<Consultation>

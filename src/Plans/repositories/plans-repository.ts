@@ -10,7 +10,10 @@ export interface PlansSchema {
 
 export interface PlansRepositorySchema {
   create(data: PlansSchema): Promise<PLANS>
-  findAll(): Promise<PLANS[]>
+  findAll(
+    page: number,
+    limit: number,
+  ): Promise<{ data: PLANS[]; total: number }>
   findById(id: string): Promise<PLANS | null>
   update(id: string, data: Partial<PlansSchema>): Promise<PLANS>
   delete(id: string): Promise<PLANS>

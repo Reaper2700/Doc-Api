@@ -2,16 +2,29 @@
 import { Consultation } from '../../../db/db'
 import { ConsultationRepository } from '../repositories/consultation-repository'
 
+interface ListConsultationUseCaseRequest {
+  page: number
+  limit: number
+}
+
 interface ListConsultationUseCaseResponse {
-  consultation: Consultation[]
+  data: Consultation[]
+  total: number
+  totalPages: number
 }
 
 export class ListConsultationUseCase {
   constructor(private consultationRepository: ConsultationRepository) {}
 
-  async execute(): Promise<ListConsultationUseCaseResponse> {
-    const consultation = await this.consultationRepository.findAll()
+  async execute({
+    page,
+    limit,
+  }: ListConsultationUseCaseRequest): Promise<ListConsultationUseCaseResponse> {
+    const { data, total } = await this.consultationRepository.findAll(
+      page,
+      limit,
+    )
 
-    return { consultation }
+    return { data, total, totalPages: Math.ceil(total / limit) }
   }
 }
