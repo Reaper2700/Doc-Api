@@ -11,12 +11,12 @@ export async function ListConsultation(
   const listUseCase = new ListConsultationUseCase(consultationRepository)
   const querySchema = z.object({
     page: z.coerce.number().min(1).default(1),
-    limit: z.coerce.number().min(10).max(20).default(10),
+    limit: z.coerce.number().min(10).max(20).default(60),
   })
 
   const { page, limit } = querySchema.parse(request.query)
 
   const response = await listUseCase.execute({ page, limit })
 
-  return reply.status(200).send(response.data)
+  return reply.status(200).send(response)
 }

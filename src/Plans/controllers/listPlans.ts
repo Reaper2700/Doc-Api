@@ -9,12 +9,12 @@ export async function listPlans(request: FastifyRequest, reply: FastifyReply) {
 
   const querySchema = z.object({
     page: z.coerce.number().min(1).default(1),
-    limit: z.coerce.number().min(10).max(40).default(40),
+    limit: z.coerce.number().min(10).max(60).default(60),
   })
 
   const { page, limit } = querySchema.parse(request.query)
 
   const response = await listPlansUseCase.execute({ page, limit })
 
-  return reply.status(200).send(response.data)
+  return reply.status(200).send(response)
 }

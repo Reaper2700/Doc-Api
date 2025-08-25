@@ -37,7 +37,21 @@ export class DBConsultationRepository implements ConsultationRepository {
       const offset = (page - 1) * limit
 
       const res = await query(
-        'SELECT * FROM "Consultation" ORDER BY "consultation_data" DESC LIMIT $1 OFFSET $2',
+        `
+      SELECT 
+        c.id,
+        c.consultation_data,
+        c.notes,
+        m.id AS medic_id,
+        m.name AS medic_name,
+        p.id AS patient_id,
+        p.name AS patient_name
+      FROM "Consultation" c
+      JOIN "Medic" m ON c.medic_id = m.id
+      JOIN "Patient" p ON c.patient_id = p.id
+      ORDER BY c.consultation_data DESC
+      LIMIT $1 OFFSET $2
+      `,
         [limit, offset],
       )
 

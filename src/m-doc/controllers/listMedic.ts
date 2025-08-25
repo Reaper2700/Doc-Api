@@ -9,7 +9,7 @@ export async function ListMedic(request: FastifyRequest, reply: FastifyReply) {
 
   const listMedicQuerySchema = z.object({
     page: z.coerce.number().min(1).default(1),
-    limit: z.coerce.number().min(10).max(20).default(10),
+    limit: z.coerce.number().min(10).max(60).default(60),
   })
 
   const { page, limit } = listMedicQuerySchema.parse(request.query)
