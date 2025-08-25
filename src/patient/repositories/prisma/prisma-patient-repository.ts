@@ -29,7 +29,20 @@ export class PrismaPatientRepository implements PatientRepository {
       const offset = (page - 1) * limit
 
       const res = await query(
-        'SELECT * FROM "Patient" ORDER BY "createAt" DESC LIMIT $1 OFFSET $2',
+        `
+      SELECT 
+        p.id,
+        p.name,
+        p.cpf,
+        p.health_plan AS plan_id,
+        pl.name AS plan_name,
+        p."birthDate",
+        p."createAt"
+      FROM "Patient" p
+      JOIN "PLANS" pl ON p.health_plan = pl.id
+      ORDER BY p."createAt" DESC
+      LIMIT $1 OFFSET $2
+      `,
         [limit, offset],
       )
 

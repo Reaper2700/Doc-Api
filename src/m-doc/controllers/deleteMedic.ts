@@ -18,13 +18,13 @@ export async function DeleteMedic(
           if (!exists) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: 'id não encontrado',
+              message: 'ID não encontrado',
             })
           }
         } catch (error) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'Erro ao verificar id',
+            message: 'Erro ao verificar ID',
           })
         }
       }),
@@ -34,16 +34,38 @@ export async function DeleteMedic(
     const { id } = await DeleteMedicParamsSchema.parseAsync(request.params)
 
     const medicRepository = new PrismaMedicRepository()
-    const deletemediUseCase = new DeleteMedicUseCase(medicRepository)
+    const deleteMedicUseCase = new DeleteMedicUseCase(medicRepository)
 
-    const medic = await deletemediUseCase.execute(id)
+    const medic = await deleteMedicUseCase.execute(id)
+
+    if (!medic) {
+      // Caso o delete não tenha retornado nada
+      return reply
+        .status(404)
+        .send({ message: 'Não foi possível deletar o médico' })
+    }
 
     return reply.status(200).send(medic)
-  } catch (err) {
+  } catch (err: unknown) {
     if (err instanceof ZodError) {
       return reply
         .status(400)
         .send({ message: 'Erro de validação', issues: err.errors })
     }
+
+    // Verifica se é um erro do tipo Error (possui message)
+    if (err instanceof Error) {
+      // Aqui podemos acessar err.message
+      console.error('Erro inesperado:', err)
+      return reply
+        .status(500)
+        .send({ message: 'Erro interno no servidor', error: err.message })
+    }
+
+    // Caso seja um erro não padrão
+    console.error('Erro inesperado não padrão:', err)
+    return reply
+      .status(500)
+      .send({ message: 'Erro interno no servidor', error: String(err) })
   }
 }
