@@ -68,7 +68,20 @@ export class DBConsultationRepository implements ConsultationRepository {
   async notification(): Promise<{ data: Consultation[] }> {
     try {
       const res = await query(
-        'SELECT * FROM "Consultation" WHERE "consultation_data" >= NOW() ORDER BY "consultation_data"',
+        `SELECT 
+        c.id, 
+        c.consultation_data, 
+        c.notes, 
+        m.id AS medic_id, 
+        m.name AS medic_name, 
+        p.id AS patient_id, 
+        p.name 
+        AS patient_name FROM "Consultation" 
+        c JOIN "Medic" m ON c.medic_id = m.id 
+        JOIN "Patient" p ON c.patient_id = p.id 
+        WHERE c.consultation_data >= now()
+        AND c.consultation_data < (date_trunc('month', now()) + INTERVAL '1 month')
+        ORDER BY "consultation_data"`,
       )
       return { data: res.rows }
     } catch (err) {

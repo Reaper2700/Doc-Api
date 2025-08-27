@@ -10,8 +10,11 @@ export async function Notification(
   const notificationUseCase = new NotificationConsultationUseCase(
     consultationRepository,
   )
+  try {
+    const response = await notificationUseCase.execute()
 
-  const response = await notificationUseCase.execute()
-
-  return reply.status(200).send(response)
+    return reply.status(200).send(response)
+  } catch (err) {
+    return reply.status(500).send({ message: 'Erro interno no servidor' })
+  }
 }

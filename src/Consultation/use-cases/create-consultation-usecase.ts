@@ -7,7 +7,7 @@ interface RegisterConsultationUseCaseRequest {
   consultation_data: Date
   medic_id: string
   patient_id: string
-  notes: Text
+  notes: string
 }
 
 interface RegisterConsultationUseCaseResponse {

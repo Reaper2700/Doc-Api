@@ -5,7 +5,7 @@ export interface dataCreateSchema {
   consultation_data: Date | string
   medic_id: string
   patient_id: string
-  notes: Text
+  notes: string
 }
 
 export interface ConsultationRepository {

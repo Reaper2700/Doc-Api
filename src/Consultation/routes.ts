@@ -9,10 +9,12 @@ import { exportToExcel } from './exportToExcel'
 import { query } from '../../db/db'
 import ExcelJS from 'exceljs'
 import { exportToExcelFilter } from './exportToExcelFilter'
+import { Notification } from './controllers/notificationConsultation'
 
 export async function appRoutesConsultation(app: FastifyInstance) {
   app.post('/consultation', registerConsultation)
   app.get('/consultation', ListConsultation)
+  app.get('/consultation/notification', Notification)
   app.delete('/consultation/:id', DeleteConsultation)
   app.patch('/consultation/:id', UpdateConsultation)
 

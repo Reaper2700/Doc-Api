@@ -9,7 +9,7 @@ export interface dataCreateSchema {
   consultation_data: Date
   medic_id: string
   patient_id: string
-  notes: Text
+  notes: string
 }
 
 export async function registerConsultation(
