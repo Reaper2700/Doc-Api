@@ -65,6 +65,18 @@ export class DBConsultationRepository implements ConsultationRepository {
     }
   }
 
+  async notification(): Promise<Consultation[] | null> {
+    try {
+      const res = await query(
+        'SELECT * FROM "Consultation" ORDER BY "consultation_data"',
+      )
+      return res.rows
+    } catch (err) {
+      console.error('Erro ao requisitar tabela agendamento:', err)
+      return null
+    }
+  }
+
   async findById(id: string): Promise<Consultation | null> {
     try {
       const res = await query(
