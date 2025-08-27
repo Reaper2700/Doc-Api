@@ -65,7 +65,7 @@ export async function UpdateMedic(
     const { id } = await updateMedicParamsSchema.parseAsync(request.params)
     const body = await updateMedicBodySchema.parseAsync(request.body)
 
-    const exists = await IdExistMedic('seu-id-aqui')
+    const exists = await IdExistMedic(id)
     console.log(exists)
     console.log('Parâmetros recebidos:', request.params)
 

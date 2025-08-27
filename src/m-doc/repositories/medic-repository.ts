@@ -12,6 +12,16 @@ export interface dataCreateSchema {
   plans: string[]
 }
 
+interface MedicWithPlans {
+  id: string
+  name: string
+  cpf: string
+  crm: string
+  birthDate: Date
+  createAt: Date
+  plans: { id: string; name: string }[]
+}
+
 interface CreateMedicResult {
   medic: Medic
   plan: any // ou defina um tipo específico para o plano se tiver
@@ -24,7 +34,10 @@ export interface MedicRepository {
     limit: number,
   ): Promise<{ data: Medic[]; total: number }>
   findById(id: string): Promise<Medic | null>
-  update(id: string, data: Partial<dataCreateSchema>): Promise<Medic>
+  update(
+    id: string,
+    data: Partial<dataCreateSchema>,
+  ): Promise<MedicWithPlans | null>
   delete(id: string): Promise<Medic>
 
   filterMedic(

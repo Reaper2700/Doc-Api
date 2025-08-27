@@ -9,6 +9,16 @@ interface CreateMedicResult {
   plan: any // ou defina um tipo específico para o plano se tiver
 }
 
+interface MedicWithPlans {
+  id: string
+  name: string
+  cpf: string
+  crm: string
+  birthDate: Date
+  createAt: Date
+  plans: { id: string; name: string }[]
+}
+
 export class PrismaMedicRepository implements MedicRepository {
   async create(data: dataCreateSchema): Promise<CreateMedicResult> {
     try {
@@ -66,39 +76,53 @@ export class PrismaMedicRepository implements MedicRepository {
 
     try {
       const res = await query(
-        'SELECT id, name, cpf, crm, "birthDate", "createAt" FROM "Medic" WHERE id = $1::uuid LIMIT 1',
+        `SELECT 
+        m.id, 
+        m.name, 
+        m.cpf, 
+        m.crm, 
+        m."birthDate", 
+        m."createAt", 
+        json_agg(json_build_object('id', p.id, 'name', p.name)) AS plans
+        FROM "Medic" m
+        LEFT JOIN "MedicPlan" mp ON mp.id_medic = m.id
+        LEFT JOIN "PLANS" p ON p.id = mp.id_plan
+        WHERE m.id = $1::uuid
+        GROUP BY m.id`,
         [id],
       )
-      return res.rows.length > 0 ? res.rows[0] : null
+
+      return {
+        ...res.rows[0],
+      }
     } catch (err) {
       console.error('Erro ao buscar médico:', err)
       return null
     }
   }
 
-  async update(id: string, data: Partial<dataCreateSchema>): Promise<Medic> {
+  async update(
+    id: string,
+    data: Partial<dataCreateSchema>,
+  ): Promise<MedicWithPlans | null> {
     try {
       const currentMedic = await this.findById(id)
-
+      console.log(currentMedic)
       if (!currentMedic) {
         console.log('Médico não encontrado!')
-        throw new Error('Médico não encontrado!')
+        return null
       }
 
       const updatedFields: Partial<dataCreateSchema> = {}
 
-      if (data.name && data.name !== currentMedic.name) {
+      if (data.name && data.name !== currentMedic.name)
         updatedFields.name = data.name
-      }
-      if (data.cpf && data.cpf !== currentMedic.cpf) {
+      if (data.cpf && data.cpf !== currentMedic.cpf)
         updatedFields.cpf = data.cpf
-      }
-      if (data.crm && data.crm !== currentMedic.crm) {
+      if (data.crm && data.crm !== currentMedic.crm)
         updatedFields.crm = data.crm
-      }
-      if (data.birthDate && data.birthDate !== currentMedic.birthDate) {
+      if (data.birthDate && data.birthDate !== currentMedic.birthDate)
         updatedFields.birthDate = data.birthDate
-      }
 
       if (Object.keys(updatedFields).length > 0) {
         const queryText =
@@ -107,20 +131,49 @@ export class PrismaMedicRepository implements MedicRepository {
             .map((key, index) => `"${key}" = $${index + 1}`)
             .join(', ') +
           ' WHERE id = $' +
-          (Object.keys(updatedFields).length + 1)
-
+          (Object.keys(updatedFields).length + 1) +
+          ' RETURNING *'
         const queryValues = [...Object.values(updatedFields), id]
-
-        const res = await query(queryText, queryValues)
+        await query(queryText, queryValues)
         console.log('Médico atualizado com sucesso!')
-        return res.rows[0]
       } else {
         console.log('Nenhuma alteração detectada.')
-        throw new Error('Nenhuma alteração detectada.')
+      }
+
+      if (data.plans) {
+        // Deletar planos antigos
+        await query('DELETE FROM "MedicPlan" WHERE medic_id = $1', [id])
+
+        // Inserir planos novos
+        if (data.plans.length > 0) {
+          const insertValues = data.plans
+            .map((planId, idx) => `($1, $${idx + 2})`)
+            .join(', ')
+          await query(
+            `INSERT INTO "MedicPlan" (medic_id, plan_id) VALUES ${insertValues}`,
+            [id, ...data.plans],
+          )
+          console.log('Planos atualizados com sucesso!')
+        }
+
+        const resMedic = await query('SELECT * FROM "Medic" WHERE id = $1', [
+          id,
+        ])
+        const resPlans = await query(
+          'SELECT p.id, p.name FROM "PLANS" p JOIN "MedicPlan" mp ON mp.plan_id = p.id WHERE mp.medic_id = $1',
+          [id],
+        )
+
+        const medicWithPlans: MedicWithPlans = {
+          ...resMedic.rows[0],
+          plans: resPlans.rows,
+        }
+
+        return medicWithPlans
       }
     } catch (err) {
       console.error('Erro ao atualizar médico:', err)
-      throw err
+      return null
     }
   }
 
