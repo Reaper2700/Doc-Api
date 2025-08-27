@@ -65,22 +65,22 @@ export class DBConsultationRepository implements ConsultationRepository {
     }
   }
 
-  async notification(): Promise<Consultation[] | null> {
+  async notification(): Promise<{ data: Consultation[] }> {
     try {
       const res = await query(
-        'SELECT * FROM "Consultation" ORDER BY "consultation_data"',
+        'SELECT * FROM "Consultation" WHERE "consultation_data" >= NOW() ORDER BY "consultation_data"',
       )
-      return res.rows
+      return { data: res.rows }
     } catch (err) {
       console.error('Erro ao requisitar tabela agendamento:', err)
-      return null
+      return { data: [] }
     }
   }
 
   async findById(id: string): Promise<Consultation | null> {
     try {
       const res = await query(
-        'SELECT * FROM "Consultation" WHERE id = $1 ::uuid LIMIT 1',
+        'SELECT * FROM "Consultation" WHERE id = $1 :z:uuid LIMIT 1',
         [id],
       )
       return res.rows.length > 0 ? res.rows[0] : null

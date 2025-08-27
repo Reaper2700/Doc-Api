@@ -2,26 +2,16 @@
 import { Consultation } from '../../../db/db'
 import { ConsultationRepository } from '../repositories/consultation-repository'
 
-interface ListConsultationUseCaseRequest {
-  date: Date
-}
-
 interface ListConsultationUseCaseResponse {
   data: Consultation[]
 }
 
-export class ListConsultationUseCase {
+export class NotificationConsultationUseCase {
   constructor(private consultationRepository: ConsultationRepository) {}
 
-  async execute({
-    page,
-    limit,
-  }: ListConsultationUseCaseRequest): Promise<ListConsultationUseCaseResponse> {
-    const { data, total } = await this.consultationRepository.findAll(
-      page,
-      limit,
-    )
+  async execute(): Promise<ListConsultationUseCaseResponse> {
+    const { data } = await this.consultationRepository.notification()
 
-    return { data, total, totalPages: Math.ceil(total / limit) }
+    return { data }
   }
 }
