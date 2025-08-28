@@ -8,6 +8,7 @@ interface UpdateMedicUseCaseRequest {
   cpf?: string
   crm?: string
   birthDate?: Date
+  plans?: string[]
 }
 
 interface UpdateMedicUseCaseResponse {
@@ -23,6 +24,7 @@ export class UpdateMedicUseCase {
     cpf,
     crm,
     birthDate,
+    plans,
   }: UpdateMedicUseCaseRequest): Promise<UpdateMedicUseCaseResponse> {
     const existingMedic = await this.medicRepository.findById(id)
 
@@ -35,6 +37,7 @@ export class UpdateMedicUseCase {
       cpf,
       crm,
       birthDate: birthDate ? new Date(birthDate) : undefined,
+      plans,
     })
 
     return { medic: updateMedic }

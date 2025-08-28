@@ -59,6 +59,7 @@ export async function UpdateMedic(
       })
       .optional(),
     birthDate: z.coerce.date().optional(),
+    plans: z.array(z.string()).optional(),
   })
 
   try {
@@ -69,12 +70,13 @@ export async function UpdateMedic(
     console.log(exists)
     console.log('Parâmetros recebidos:', request.params)
 
-    const { name, cpf, crm, birthDate } = body
+    const { name, cpf, crm, birthDate, plans } = body
     const updateData: any = {
       name,
       cpf,
       crm,
       birthDate,
+      plans,
     }
 
     const medicRepository = new PrismaMedicRepository()
