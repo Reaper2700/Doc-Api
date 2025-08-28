@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-constructor */
-import { Medic } from '@prisma/client'
-import { MedicRepository } from '../repositories/medic-repository'
+import {
+  dataCreateSchema,
+  MedicRepository,
+} from '../repositories/medic-repository'
 
 interface UpdateMedicUseCaseRequest {
   id: string
@@ -8,11 +10,11 @@ interface UpdateMedicUseCaseRequest {
   cpf?: string
   crm?: string
   birthDate?: Date
-  plans?: string[]
+  plans?: { id: string; name: string }[]
 }
 
 interface UpdateMedicUseCaseResponse {
-  medic: Medic
+  medic: dataCreateSchema | null
 }
 
 export class UpdateMedicUseCase {

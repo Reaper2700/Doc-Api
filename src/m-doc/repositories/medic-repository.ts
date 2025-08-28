@@ -9,7 +9,7 @@ export interface dataCreateSchema {
   crm: string
   birthDate: Date | string
   createAt?: Date | string
-  plans: string[]
+  plans: { id: string; name: string }[]
 }
 
 interface MedicWithPlans {
